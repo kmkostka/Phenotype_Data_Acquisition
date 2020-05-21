@@ -3,3 +3,5 @@ OMOP,5.2,generate_cohort,Y,OMOP_generate_cohort.sql
 OMOP,5.2,extract,Y,OMOP_extract.sql
 OMOP,5.3,generate_cohort,Y,OMOP_generate_cohort.sql
 OMOP,5.3,extract,Y,OMOP_extract.sql
+PCORNet,5.1,generate_cohort,Y,PCORNET_generate_cohort.sql
+PCORNet,5.1,extract,Y,PCORNET_extract.sql
