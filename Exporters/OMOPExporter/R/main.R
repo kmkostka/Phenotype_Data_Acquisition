@@ -22,7 +22,9 @@ execute <- function(connectionDetails,
                          resultsDatabaseSchema = resultsDatabaseSchema,
                          vocabularyDatabaseSchema = cdmDatabaseSchema,
                          targetCohortTable = targetCohortTable,
-                         targetCohortId = targetCohortId
+                         targetCohortId = targetCohortId,
+                         cdmName = cdmName,
+                         cdmVersion = cdmVersion
   )
 
 

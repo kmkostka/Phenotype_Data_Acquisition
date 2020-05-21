@@ -55,7 +55,9 @@ N3cOhdsi::createCohort(connectionDetails = con_details,
                         resultsDatabaseSchema = resultsDatabaseSchema,
                         vocabularyDatabaseSchema = cdmDatabaseSchema,
                         targetCohortTable = targetCohortTable,
-                        targetCohortId = targetCohortId
+                        targetCohortId = targetCohortId,
+                        cdmName = cdmName,
+                        cdmVersion = cdmVersion
                         )
 
 # Extract data to pipe delimited files

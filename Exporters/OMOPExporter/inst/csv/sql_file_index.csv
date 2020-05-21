@@ -1,0 +1,5 @@
+cdm,version,script_type,supported,file_path
+OMOP,5.2,generate_cohort,Y,OMOP_generate_cohort.sql
+OMOP,5.2,extract,Y,OMOP_extract.sql
+OMOP,5.3,generate_cohort,Y,OMOP_generate_cohort.sql
+OMOP,5.3,extract,Y,OMOP_extract.sql

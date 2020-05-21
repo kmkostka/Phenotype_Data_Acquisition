@@ -68,9 +68,13 @@ runExtraction  <- function(connectionDetails,
   if (!file.exists(paste0(outputFolder,"DATAFILES")))
     dir.create(paste0(outputFolder,"DATAFILES"), recursive = TRUE)
 
-  # -- TODO: here, select appropriate file name using cdmName and cdmVersion
+  # select appropriate file name using cdmName and cdmVersion
 
-  src_sql <-  SqlRender::loadRenderTranslateSql(sqlFilename = "source_extract_scripts.sql",
+  sql_file_path <- getSqlFile(cdmName = cdmName,
+                              cdmVersion = cdmVersion,
+                              scriptType = "extract")
+
+  src_sql <-  SqlRender::loadRenderTranslateSql(sqlFilename = sql_file_path,
                                                     packageName = "N3cOhdsi",
                                                     dbms = connectionDetails$dbms,
                                                     cdmDatabaseSchema = cdmDatabaseSchema,

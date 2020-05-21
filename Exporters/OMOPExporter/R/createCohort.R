@@ -7,12 +7,18 @@ createCohort <- function(connectionDetails,
                             resultsDatabaseSchema,
                             vocabularyDatabaseSchema,
                             targetCohortTable = "cohort",
-                            targetCohortId = 9999
+                            targetCohortId = 9999,
+                            cdmName,
+                            cdmVersion
 
                             ) {
 
+  sql_file_path <- getSqlFile(cdmName = cdmName,
+                              cdmVersion = cdmVersion,
+                              scriptType = "generate_cohort")
 
-  sql <- SqlRender::loadRenderTranslateSql("generate_cohort.sql",
+
+  sql <- SqlRender::loadRenderTranslateSql(sql_file_path,
                                          "N3cOhdsi",
                                          dbms = connectionDetails$dbms,
                                          cdm_database_schema = cdmDatabaseSchema,
