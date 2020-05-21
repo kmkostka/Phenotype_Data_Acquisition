@@ -4,8 +4,8 @@ extractCohortData <- function(connectionDetails,
                               cdmDatabaseSchema,
                               resultsDatabaseSchema,
                               outputFolder) {
-  
-  
+
+
   sql <- SqlRender::loadRenderTranslateSql(sqlFilename = sqlFile,
                                            packageName = "N3cOhdsi",
                                            dbms = connectionDetails$dbms,
@@ -13,11 +13,11 @@ extractCohortData <- function(connectionDetails,
                                            cohortDatabaseSchema = resultsDatabaseSchema
   )
   conn <- DatabaseConnector::connect(connectionDetails)
-  
+
   result <- DatabaseConnector::querySql(conn, sql)
-  
+
   write.table(result, file = paste0(outputFolder, fileName ), sep = "|")
-  
+
   DatabaseConnector::disconnect(conn)
 }
 
@@ -25,55 +25,98 @@ extractCohortData <- function(connectionDetails,
 parse_sql <- function(sqlFile) {
   sql <- ""
   output_file_tag <- "OUTPUT_FILE:"
-  inrows <- readLines(file(sqlFile, "r"))
+  #inrows <- readLines(file(sqlFile, "r"))
+  inrows <- unlist(strsplit(sqlFile, "\r\n"))
   statements <- list()
   outputs <- list()
   statementnum <- 0
-  
+
   for (i in 1:length(inrows)) {
     sql = paste(sql, inrows[i], sep = "\n")
     if (regexpr("OUTPUT_FILE", inrows[i]) != -1) {
-      output_file <- sub("--OUTPUT_FILE: ", "", inrows[i]) 
+      output_file <- sub("--OUTPUT_FILE: ", "", inrows[i])
       }
     if (regexpr(";", inrows[i]) != -1) {
       statementnum <- statementnum + 1
       statements[[statementnum]] = sql
       outputs[[statementnum]] = output_file
-      sql <- "" 
+      sql <- ""
       }
   }
-  
+
   mapply(c, outputs, statements)
-  
+
 }
 
-allSQL <- parse_sql("source_extract_scripts.sql") #swap this out as needed
 
 runExtraction  <- function(connectionDetails,
                            cdmDatabaseSchema,
                            resultsDatabaseSchema,
-                           outputFolder = paste0(getwd(), "/output/"))
+                           outputFolder = paste0(getwd(), "/output/"),
+                           cdmName,
+                           cdmVersion,
+                           siteAbbrev,
+                           contactName,
+                           contactEmail
+                           )
 {
-  
+
   # create output dir if it doesn't already exist
   if (!file.exists(file.path(outputFolder)))
     dir.create(file.path(outputFolder), recursive = TRUE)
-  
+
   if (!file.exists(paste0(outputFolder,"DATAFILES")))
     dir.create(paste0(outputFolder,"DATAFILES"), recursive = TRUE)
-  
+
+  # -- TODO: here, select appropriate file name using cdmName and cdmVersion
+
+  src_sql <-  SqlRender::loadRenderTranslateSql(sqlFilename = "source_extract_scripts.sql",
+                                                    packageName = "N3cOhdsi",
+                                                    dbms = connectionDetails$dbms,
+                                                    cdmDatabaseSchema = cdmDatabaseSchema,
+                                                    cohortDatabaseSchema = resultsDatabaseSchema,
+                                                    cdmName = cdmName,
+                                                    cdmVersion = cdmVersion,
+                                                    siteAbbrev = siteAbbrev,
+                                                    contactName = contactName,
+                                                    contactEmail = contactEmail
+                                            )
+
+
+  allSQL <- parse_sql(src_sql) #swap this out as needed
+
+
   #iterate through query list
   for (i in seq(from = 1, to = length(allSQL), by = 2)) {
     fileNm <- allSQL[i]
     sql <- allSQL[i+1]
-    
-  extractCohortData(connectionDetails,
-                      sqlFile = sql,
-                      fileName = fileNm,
-                      cdmDatabaseSchema,
-                      resultsDatabaseSchema,
-                      outputFolder = paste0(outputFolder, "DATAFILES/"))
+
+    output_path <- outputFolder
+
+    if(fileNm != "MANIFEST.csv" && fileNm != "DATA_COUNTS.csv"){
+      output_path <- paste0(outputFolder, "DATAFILES/")
+    }
+
+    executeChunk(connectionDetails,
+                 sql = sql,
+                 fileName = fileNm,
+                 outputFolder = output_path)
 
   }
-  
+
+}
+
+
+executeChunk <- function(connectionDetails,
+                         sql,
+                         fileName,
+                         outputFolder){
+
+  conn <- DatabaseConnector::connect(connectionDetails)
+
+  result <- DatabaseConnector::querySql(conn, sql)
+
+  write.table(result, file = paste0(outputFolder, fileName ), sep = "|")
+
+  DatabaseConnector::disconnect(conn)
 }

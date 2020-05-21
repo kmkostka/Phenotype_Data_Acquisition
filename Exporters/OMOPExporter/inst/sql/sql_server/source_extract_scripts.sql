@@ -313,7 +313,7 @@ WHERE DRUG_ERA_START_DATE >= '1/1/2018';
 
 SELECT
    DOSE_ERA_ID,
-   PERSON_ID,
+   n.PERSON_ID,
    DRUG_CONCEPT_ID,
    UNIT_CONCEPT_ID,
    DOSE_VALUE,
@@ -426,11 +426,11 @@ select
 --MANIFEST TABLE: CHANGE PER YOUR SITE'S SPECS
 --OUTPUT_FILE: MANIFEST.csv
 select
-   'OHDSI' as SITE_ABBREV,
-   'Jane Doe' as CONTACT_NAME,
-   'jane_doe@OHDSI.edu' as CONTACT_EMAIL,
-   'OMOP' as CDM_NAME,
-   '5.3.1' as CDM_VERSION,
+   '@siteAbbrev' as SITE_ABBREV,
+   '@contactName' as CONTACT_NAME,
+   '@contactEmail' as CONTACT_EMAIL,
+   '@cdmName' as CDM_NAME,
+   '@cdmVersion' as CDM_VERSION,
    'Y' as N3C_PHENOTYPE_YN,
    '1.3' as N3C_PHENOTYPE_VERSION,
    CONVERT(VARCHAR(20), GETDATE(), 120) as RUN_DATE,
